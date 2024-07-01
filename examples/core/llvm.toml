@@ -1,0 +1,50 @@
+# This is an example fixup package configuration file.
+# It defines how a certain package should be installed.
+# For TOML syntax details see: https://toml.io/
+
+# The package section defines basic information about the package.
+[package]
+# The name of the package to be registered in the database of the installed packages.
+name = 'llvm'
+# The description should provide a short summary of what the package contains.
+description = 'A collection of modular and reusable compiler and toolchain technologies.'
+# The homepage should contain a link to more information. This is optional.
+homepage = 'https://llvm.org/'
+# The list of licenses that this package is distributed under.
+licenses = ['Apache-2.0']
+# The version of the package.
+version = '18.1.8'
+# The internal fixup iteration counter (use this to denote that the package has been
+# updated even if the version string remained the same).
+iteration = 0
+
+# Each source table should contain at least the url and sha256 key.
+[[sources]]
+url = 'https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz'
+sha256 = '09c08693a9afd6236f27a2ebae62cda656eba19021ef3f94d59e931d662d4856'
+
+# Recipie denotes what steps to take to build and install the package. These are:
+#  - prep: preparing the downloaded sources for the building process
+#  - build: configuring and compiling the package
+#  - test: testing that the compilation has been successful
+#  - install: installing the package into a fakeroot environment
+[recipie]
+prepare = [
+    ['tar', '-xzf', '${DOWNLOADS}/llvmorg-18.1.8.tar.gz', '-C', '${SOURCES}'],
+]
+build = [
+    [
+        'cmake', 
+        '-G', 
+        'Unix Makefiles', 
+        '-DCMAKE_BUILD_TYPE=Release', 
+        '-DCMAKE_INSTALL_PREFIX=/usr',
+        '-DLLVM_TARGETS_TO_BUILD=host',
+        '-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;flang;libc;lld;lldb',
+        '${SOURCES}/llvm-project-llvmorg-18.1.8'
+    ],
+    ['make'],
+]
+test = []
+install = []
+
